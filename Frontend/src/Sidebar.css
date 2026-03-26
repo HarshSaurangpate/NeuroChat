@@ -1,0 +1,9 @@
+/* Sidebar hover like ChatGPT */
+.sidebar-item {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sidebar-item:hover {
+  background-color: #2a2b32;
+}

@@ -1,11 +1,29 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "./Sidebar.css";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { MyContext } from "./MyContext";
 
 function Sidebar() {
-
+  const {allThreads, setAllThreads, currThreadId} = useContext(MyContext);
   const [isOpen, setIsOpen] = useState(true);
+  const getAllThreads = async () => {
+
+    try {
+      const response = await fetch("http://localhost:8080/api/thread");
+      const res = await response.json();
+      const filteredData = res.map(thread =>({threadId: thread.threadId, title: thread.title}));
+      console.log(filteredData);
+      setAllThreads(filteredData);
+      //threadId, title
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getAllThreads();
+  }, [currThreadId])
 
   return (
     <div 
@@ -46,15 +64,19 @@ function Sidebar() {
 
       {/* Chat List */}
       <div className="flex-grow-1 overflow-auto">
-
-        <div className="d-flex align-items-center gap-2 p-1 rounded mb-1 sidebar-item">
-          {isOpen && "Chat 1"}
-        </div>
-
-        <div className="d-flex align-items-center gap-2 p-1 rounded mb-1 sidebar-item">
-          {isOpen && "Chat 2"}
-        </div>
-
+      
+        {allThreads?.map((thread, idx) => (
+          <div 
+            key={thread.threadId || idx}
+            className="d-flex align-items-center gap-2 p-2 rounded mb-1 sidebar-item"
+            style={{ cursor: "pointer" }}
+          >
+            {isOpen && (
+              <span className="text-truncate">{thread.title}</span>
+            )}
+          </div>
+        ))}
+      
       </div>
 
       {/* Bottom Section */}

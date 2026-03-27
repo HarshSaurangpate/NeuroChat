@@ -10,6 +10,8 @@ function App() {
   const [currThreadId, setCurrThreadId] = useState(uuidv1());
   const [prevChats, setPrevChats] = useState([]); //stores all chats of threads
   const [newChat, setNewChat] = useState(true);
+  const [isOpen, setIsOpen] = useState(true);
+
 
   const providerValues = {
     prompt, setPrompt,
@@ -22,9 +24,9 @@ function App() {
   return (
     <MyContext.Provider value={providerValues}>
       
-       <div className="d-flex vh-100">
-      <Sidebar />
-      <ChatWindow />
+    <div className="d-flex vh-100">
+      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+      <ChatWindow isOpen={isOpen} />
     </div>
 
     </MyContext.Provider>

@@ -25,7 +25,7 @@ function Sidebar() {
         {isOpen && (
           <div className="d-flex align-items-center gap-2">
             <img src="src/assets/neurochat.png" style={{ height:"28px", width:"28px"}} />
-            <h5 className="m-0">NeuroChat</h5>
+            {/* <h5 className="m-0">NeuroChat</h5> */}
           </div>
         )}
 

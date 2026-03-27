@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { MyContext } from "./MyContext";
 import { ScaleLoader } from "react-spinners";
 
-function ChatWindow() {
+function ChatWindow({isOpen}) {
     const {prompt, setPrompt, reply, setReply, currThreadId, prevChats, setPrevChats} = useContext(MyContext);
     const [loading, setLoading] = useState(false);
 
@@ -56,11 +56,7 @@ function ChatWindow() {
     }, [reply]);
   return (
     <div className="flex-grow-1 d-flex flex-column bg-black text-white" 
-       style={{ backgroundColor: "#212121", color: "#FFFFFF", /* 🔥 ADDED (sidebar adjustment) */
-    marginLeft: window.innerWidth >= 768 
-      ? (isOpen ? "260px" : "70px") 
-      : "0",
-    transition: "margin-left 0.3s ease"
+       style={{ backgroundColor: "#212121", color: "#FFFFFF", width: "100%", transition: "0.3s"
    }}>
       {/* Navbar */}
       <div className="p-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: "#212121", color: "#FFFFFF", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>

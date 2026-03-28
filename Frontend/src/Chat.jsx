@@ -12,11 +12,18 @@ import "highlight.js/styles/github-dark.css";
 
 function Chat() {
     const {newChat, prevChats, reply} = useContext(MyContext);
+
+    const chats = Array.isArray(prevChats) ? prevChats : [];
+
     const [latestReply, setLatestReply] = useState(null);
 
     useEffect(() => {
+        if(reply === null) {
+            setLatestReply(null); //prevchat load
+            return;
+        }
         //latestReply separate => typing effect create
-        if(!prevChats?.length) return;
+        if(!chats.length) return;
 
         const content = reply.split(" "); //individual words
 
@@ -35,12 +42,13 @@ function Chat() {
     <>
     <div className="d-flex justify-content-center">
         <div style={{ width: "100%", maxWidth: "750px" }}>
-          <div className="d-flex justify-content-center">
-              {newChat && <h1>Start a New Chat!</h1>}
+          <div className="d-flex justify-content-center align-items-center"
+            style={{ height: "60vh"}}>
+              {newChat && <h1>How can I help you today?</h1>}
           </div>
         <div className="chats">
            {
-           prevChats?.slice(0, -1).map((chat, idx) =>
+           chats.slice(0, -1).map((chat, idx) =>
            chat.role === "user" ? (
 
            // ✅ USER MESSAGE (RIGHT SIDE)
@@ -60,11 +68,23 @@ function Chat() {
           )
          )}
          {
-            prevChats.length > 0 && latestReply !== null &&
-            <div className="gptDiv" key={"typing"}>
-                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{latestReply}</ReactMarkdown>
-            </div>
+            chats.length > 0 && (
+                <>
+                {
+                    latestReply === null ? (
+                        <div className="gptDiv" key={"non-typing"}>
+                        <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{chats[chats.length-1].content}</ReactMarkdown>
+                        </div>
+                    ): (
+                        <div className="gptDiv" key={"typing"}>
+                         <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{latestReply}</ReactMarkdown>
+                        </div>
+                    )
+                }
+                </>
+            )
          }
+
         </div>
 
        </div>

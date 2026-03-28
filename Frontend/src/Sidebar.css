@@ -7,3 +7,17 @@
 .sidebar-item:hover {
   background-color: #2a2b32;
 }
+
+.delete-icon {
+  opacity: 0;
+  transition: 0.2s;
+  color: #aaa;
+}
+
+.sidebar-item:hover .delete-icon {
+  opacity: 1;
+}
+
+.delete-icon:hover {
+  color: #f87171;
+}

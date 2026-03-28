@@ -4,12 +4,13 @@ import { useContext, useEffect, useState } from "react";
 import { MyContext } from "./MyContext";
 import { ScaleLoader } from "react-spinners";
 
-function ChatWindow({isOpen}) {
-    const {prompt, setPrompt, reply, setReply, currThreadId, prevChats, setPrevChats} = useContext(MyContext);
+function ChatWindow({ isOpen, setIsOpen }) {
+    const {prompt, setPrompt, reply, setReply, currThreadId, prevChats, setPrevChats, setNewChat} = useContext(MyContext);
     const [loading, setLoading] = useState(false);
 
     const getReply = async () => {
        setLoading(true);
+       setNewChat(false);
         if (!prompt) {
         alert("Please enter a message");
         return;
@@ -56,12 +57,14 @@ function ChatWindow({isOpen}) {
     }, [reply]);
   return (
     <div className="flex-grow-1 d-flex flex-column bg-black text-white" 
-       style={{ backgroundColor: "#212121", color: "#FFFFFF", width: "100%", transition: "0.3s"
+       style={{ backgroundColor: "#212121", color: "#FFFFFF", width: "100%", transition: "0.3s", marginLeft: window.innerWidth >= 768 
+      ? (isOpen ? "260px" : "70px") 
+      : "0",
    }}>
       {/* Navbar */}
       <div className="p-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: "#212121", color: "#FFFFFF", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
         <span className="fs-5">NeuroChat<i className="fa-solid fa-chevron-down"></i></span>
-        <button className="btn btn-outline-light btn-sm d-md-none">☰</button>
+        <button className="btn btn-outline-light btn-sm d-md-none" onClick={() => setIsOpen(true)}>☰</button>
       </div>
 
       

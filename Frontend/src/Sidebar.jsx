@@ -4,6 +4,7 @@ import "./Sidebar.css";
 import { useState, useContext } from "react";
 import { MyContext } from "./MyContext";
 import {v1 as uuidv1} from "uuid";
+import logo from "./assets/neurochat.png";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Sidebar({ isOpen, setIsOpen }) {
@@ -111,7 +112,7 @@ function Sidebar({ isOpen, setIsOpen }) {
 
         {isOpen && (
           <div className="d-flex align-items-center gap-2">
-            <img src="src/assets/neurochat.png" style={{ height:"28px", width:"28px"}} />
+            <img src={logo} style={{ height:"28px", width:"28px"}} />
           </div>
         )}
 

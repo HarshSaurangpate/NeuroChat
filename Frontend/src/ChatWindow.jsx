@@ -3,6 +3,7 @@ import "./ChatWindow.css";
 import { useContext, useEffect, useState } from "react";
 import { MyContext } from "./MyContext";
 import { ScaleLoader } from "react-spinners";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function ChatWindow({ isOpen, setIsOpen }) {
     const {prompt, setPrompt, reply, setReply, currThreadId, prevChats, setPrevChats, setNewChat} = useContext(MyContext);
@@ -30,7 +31,7 @@ function ChatWindow({ isOpen, setIsOpen }) {
             })
         };
         try {
-            const response = await fetch("http://localhost:8080/api/chat", options);
+            const response = await fetch(`${API_URL}/api/chat`, options);
             const res = await response.json();
             console.log(res);
             setReply(res.reply);

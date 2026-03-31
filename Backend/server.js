@@ -1,9 +1,10 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import Groq from "groq-sdk";
 import mongoose from "mongoose";
 import chatRoutes from "./routes/chat.js"
+import authRoutes from "./routes/auth.js";
+import { verifyToken } from "./middleware/auth.js";
 
 dotenv.config();
 
@@ -12,6 +13,11 @@ const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(cors());
+app.use("/api/auth", authRoutes);
+
+app.post("/api/chat", verifyToken, (req, res) => {
+  // Only logged-in users can chat
+});
 
 // ✅ Root route (FIX)
 app.get("/", (req, res) => {

@@ -1,8 +1,18 @@
 import express from "express";
 import Thread from "../models/Thread.js";
 import getGroqAPIResponse from "../utils/groq.js";
+import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
+
+// ✅ Protected Chat Route
+router.post("/chat", verifyToken, (req, res) => {
+  res.json({
+    message: "Chat API working",
+    user: req.user
+  });
+});
+
 
 //test 
 router.post("/test", async(req, res) => {

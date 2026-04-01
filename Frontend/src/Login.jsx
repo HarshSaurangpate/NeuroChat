@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Login({ setIsOpen }) {
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -15,7 +17,7 @@ function Login({ setIsOpen }) {
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post("http://localhost:8080/api/auth/login", form);
+      const res = await axios.post(`${API_URL}/api/auth/login`, form);
       login(res.data);
       navigate("/");
     } catch (err) {

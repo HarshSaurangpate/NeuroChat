@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./components/Navbar";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Signup({ setIsOpen }) {
   const navigate = useNavigate();
 
@@ -15,7 +17,7 @@ function Signup({ setIsOpen }) {
 
   const handleSignup = async () => {
     try {
-      await axios.post("http://localhost:8080/api/auth/signup", form);
+      await axios.post(`${API_URL}/api/auth/signup`, form);
       alert("Signup successful");
       navigate("/login");
     } catch (err) {

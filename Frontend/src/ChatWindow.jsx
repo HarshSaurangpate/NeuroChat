@@ -3,136 +3,175 @@ import "./ChatWindow.css";
 import { useContext, useEffect, useState } from "react";
 import { MyContext } from "./MyContext";
 import { ScaleLoader } from "react-spinners";
+import Navbar from "./components/Navbar";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 function ChatWindow({ isOpen, setIsOpen }) {
-    const {prompt, setPrompt, reply, setReply, currThreadId, prevChats, setPrevChats, setNewChat} = useContext(MyContext);
-    const [loading, setLoading] = useState(false);
 
-    const getReply = async () => {
-       setLoading(true);
-       setNewChat(false);
-        if (!prompt) {
-        alert("Please enter a message");
-        return;
-        }
-        const threadId = currThreadId || Date.now().toString();
-        console.log("Prompt:", prompt);
-        console.log("ThreadId:", threadId);
+  const {
+    prompt, setPrompt,
+    reply, setReply,
+    currThreadId,
+    prevChats, setPrevChats,
+    setNewChat
+  } = useContext(MyContext);
 
-        const options = {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: prompt,
-                threadId: threadId
-            })
-        };
-        try {
-            const response = await fetch(`${API_URL}/api/chat`, options);
-            const res = await response.json();
-            console.log(res);
-            setReply(res.reply);
-        } catch (err) {
-            console.log("Fetch Error:", err);
-        }
-        setLoading(false);
+  const [loading, setLoading] = useState(false);
+
+  const getReply = async () => {
+    if (!prompt) {
+      alert("Please enter a message");
+      return;
     }
-    //Append new Chat to prevChats
-    useEffect(() => {
-      if(prompt && reply) {
-        setPrevChats(prevChats => {
-         return [...prevChats, {
-            role: "user",
-            content: prompt
-          },{
-            role: "assistant",
-            content: reply
-          }]
-      })
-      }
 
-      setPrompt("");
-    }, [reply]);
+    setLoading(true);
+    setNewChat(false);
+
+    const threadId = currThreadId || Date.now().toString();
+
+    try {
+      const response = await fetch(`${API_URL}/api/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: prompt,
+          threadId
+        })
+      });
+
+      const res = await response.json();
+      setReply(res.reply);
+
+    } catch (err) {
+      console.log("Fetch Error:", err);
+    }
+
+    setLoading(false);
+  };
+
+  // Append chats
+  useEffect(() => {
+    if (prompt && reply) {
+      setPrevChats(prev => [
+        ...prev,
+        { role: "user", content: prompt },
+        { role: "assistant", content: reply }
+      ]);
+    }
+
+    setPrompt("");
+  }, [reply]);
+
   return (
-    <div className="flex-grow-1 d-flex flex-column bg-black text-white" 
-       style={{ backgroundColor: "#212121", color: "#FFFFFF", width: "100%", transition: "0.3s", marginLeft: window.innerWidth >= 768 
-      ? (isOpen ? "260px" : "70px") 
-      : "0",
-   }}>
-      {/* Navbar */}
-      <div className="p-3 d-flex justify-content-between align-items-center" style={{ backgroundColor: "#212121", color: "#FFFFFF", borderBottom: "1px solid rgba(255,255,255,0.1)" }}>
-        <span className="fs-5">NeuroChat<i className="fa-solid fa-chevron-down"></i></span>
-        <button className="btn btn-outline-light btn-sm d-md-none" onClick={() => setIsOpen(true)}>☰</button>
+  <div
+    style={{
+      height: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: "#212121",
+      color: "#fff",
+      overflow: "hidden" // 🔥 Prevent full page scroll
+    }}
+  >
+
+    {/* ================= NAVBAR ================= */}
+    <Navbar setIsOpen={setIsOpen} />
+
+    {/* ================= CHAT AREA ================= */}
+    <div
+      style={{
+        flex: 1,
+        minHeight: 0, // 🔥 Important for flex scroll fix
+        overflowY: "auto",
+        overflowX: "hidden",
+        padding: "16px",
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+
+      {/* Chat Container (fixed width like ChatGPT) */}
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "800px"
+        }}
+      >
+        <Chat />
       </div>
 
-      
-      {/* Chat Area */}
-     <div className="flex-grow-1 d-flex flex-column position-relative" style={{ minHeight: 0, backgroundColor: "#212121", color: "#FFFFFF" }}>
-  
-      {/* Chat Content */}
-     <div className="flex-grow-1 overflow-auto p-3" style={{ minHeight: 0 }}>
-      <Chat />
-     </div>
-
-     {/*Loader (Centered) */}
-     {loading && (
-     <div className="position-absolute top-50 start-50 translate-middle">
-      <ScaleLoader color="#fff" loading={loading} />
-     </div>
-     )}
+      {/* ================= LOADER ================= */}
+      {loading && (
+        <div className="position-absolute top-50 start-50 translate-middle">
+          <ScaleLoader color="#fff" />
+        </div>
+      )}
 
     </div>
 
-      {/* Input */}
-      <div className="p-3 d-flex flex-column align-items-center" style={{ backgroundColor: "#212121" }}>
-  
-  <div className="input-group w-100" style={{ maxWidth: "750px" }}>
-    
-    <input
-      type="text"
-      className="form-control border-0 shadow-none"
+    {/* ================= INPUT SECTION ================= */}
+    <div
       style={{
-        backgroundColor: "#2f2f2f",   
-        color: "#ffffff",
-        height: "50px",
-        fontSize: "16px",
-        padding: "12px 20px",
-        outline: "none",              
-        boxShadow: "none"             
+        padding: "16px",
+        borderTop: "1px solid rgba(255,255,255,0.1)"
       }}
-      placeholder="Ask anything..."
-      value={prompt}
-      onChange={(e) => setPrompt(e.target.value)}
-      onKeyDown={(e) => e.key === 'Enter' ? getReply() : ''}
-    />
-
-    <button 
-      className="btn border-0 shadow-none"
-      style={{
-        backgroundColor: "#2f2f2f",
-        color: "#ffffff"
-      }}
-      onClick={getReply}
     >
-      <i className="fa-solid fa-paper-plane"></i>
-    </button>
+
+      {/* Input Wrapper (center aligned) */}
+      <div
+        style={{
+          width: "100%",
+          maxWidth: "800px",
+          margin: "0 auto",
+        }}
+      >
+
+        {/* Input + Button */}
+        <div className="input-group">
+
+          {/* Text Input */}
+          <input
+            type="text"
+            className="form-control border-0"
+            style={{
+              backgroundColor: "#2f2f2f",
+              color: "#fff",
+              height: "50px"
+            }}
+            placeholder="Ask anything..."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && getReply()}
+          />
+
+          {/* Send Button */}
+          <button
+            className="btn border-0"
+            style={{
+              backgroundColor: "#2f2f2f",
+              color: "#fff"
+            }}
+            onClick={getReply}
+          >
+            <i className="fa-solid fa-paper-plane"></i>
+          </button>
+
+        </div>
+
+        {/* Footer Note */}
+        <p className="text-center mt-2" style={{ fontSize: "12px" }}>
+          NeuroChat can make mistakes. Check important info.
+        </p>
+
+      </div>
+
+    </div>
 
   </div>
-
-  <p 
-    className="text-center mt-2 text-white" 
-    style={{ maxWidth: "750px", fontSize: "12px" }}
-  >
-    NeuroChat can make mistakes. Check important info. See Cookie Preferences.
-  </p>
-
-</div>
-
-    </div>
-  );
+);
 }
 
 export default ChatWindow;

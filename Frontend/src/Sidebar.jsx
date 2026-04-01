@@ -5,10 +5,15 @@ import { useState, useContext } from "react";
 import { MyContext } from "./MyContext";
 import {v1 as uuidv1} from "uuid";
 import logo from "./assets/neurochat.png";
+import { AuthContext } from "./AuthContext";
+import { useNavigate } from "react-router-dom";
+
+
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Sidebar({ isOpen, setIsOpen }) {
-  const {allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats} = useContext(MyContext);
+  const {allThreads, setAllThreads, currThreadId, setNewChat, setPrompt, setReply, setCurrThreadId, setPrevChats, user, logout} = useContext(MyContext);
   const getAllThreads = async () => {
 
     try {
@@ -70,6 +75,11 @@ function Sidebar({ isOpen, setIsOpen }) {
     }
   }
 
+  const [showProfile, setShowProfile] = useState(false);
+  const { User, Logout } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const isMobile = window.innerWidth < 768;
+
   return (
   <>
     {/* 🔥 Overlay (Mobile Only) */}
@@ -96,13 +106,13 @@ function Sidebar({ isOpen, setIsOpen }) {
         width: isOpen ? "260px" : "70px",
         backgroundColor: "#171717", 
         height: "100vh",
-        transition: "0.3s",
+        transition: "width 0.3s ease",
 
         position: "fixed",
         top: 0,
-        left: window.innerWidth >= 768 
-          ? "0" 
-          : (isOpen ? "0" : "-260px"),
+        left: isMobile 
+        ? (isOpen ? "0" : "-260px")   // 📱 mobile slide
+        : "0", 
         zIndex: 999
       }}
     >
@@ -149,28 +159,95 @@ function Sidebar({ isOpen, setIsOpen }) {
       )}
 
       {/* RIGHT SIDE (Delete Icon) */}
-      <i 
-        className="fa-solid fa-trash delete-icon"
+      <i className="fa-solid fa-trash delete-icon"
         onClick={(e) => {
           e.stopPropagation();
           console.log("Deleting ID:", thread.threadId); // 🔥 VERY IMPORTANT (prevent chat click)
           deleteThread(thread.threadId);
-        }}
-      ></i>
-    </div>
-  ))}
-</div>
+        }}>
+        </i>
+       </div>
+      ))}
+     </div>
 
       {/* Bottom Section */}
-      <div 
-        className="mt-auto" 
-        style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}
+{/* Bottom Section */}
+<div 
+  className="mt-auto position-relative" 
+  style={{ borderTop: "1px solid rgba(255,255,255,0.1)" }}
+>
+
+  {/* Profile Button */}
+  <div 
+    className="d-flex align-items-center gap-2 p-2 rounded sidebar-item"
+    style={{ cursor: "pointer" }}
+    onClick={() => setShowProfile(!showProfile)}
+  >
+    <i className="bi bi-person-circle"></i>
+    {isOpen && (User ? User.User?.name : "Profile")}
+  </div>
+
+  {/* 🔥 PROFILE DROPDOWN */}
+  {showProfile && User && (
+    <div
+      className="p-3 rounded shadow"
+      style={{
+        position: "absolute",
+        bottom: "60px",
+        left: isOpen ? "10px" : "70px",
+        width: "200px",
+        backgroundColor: "#2a2a2a",
+        zIndex: 1000
+      }}
+    >
+      {/* Username */}
+      <p className="mb-1 fw-bold">
+        {User.User?.name}
+      </p>
+
+      {/* Email */}
+      <p className="mb-2 text-muted" style={{ fontSize: "12px" }}>
+        {User.User?.email}
+      </p>
+
+      {/* Logout */}
+      <button 
+        className="btn btn-sm btn-danger w-100"
+        onClick={Logout}
       >
-        <div className="d-flex align-items-center gap-2 p-2 rounded sidebar-item">
-          <i className="bi bi-person-circle"></i>
-          {isOpen && "Profile"}
-        </div>
-      </div>
+        Logout
+      </button>
+    </div>
+  )}
+
+  {/* 🔐 NOT LOGGED IN */}
+  {showProfile && !user && (
+    <div
+      className="p-2 rounded shadow"
+      style={{
+        position: "absolute",
+        bottom: "60px",
+        left: isOpen ? "10px" : "70px",
+        backgroundColor: "#2a2a2a"
+      }}
+    >
+      <button 
+        className="btn btn-sm btn-outline-light w-100 mb-2"
+        onClick={() => navigate("/Login")}
+      >
+        Login
+      </button>
+
+      <button 
+        className="btn btn-sm btn-light w-100"
+        onClick={() => navigate("/Signup")}
+      >
+        Signup
+      </button>
+    </div>
+  )}
+
+</div>
 
     </div>
   </>

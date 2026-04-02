@@ -5,15 +5,6 @@ import { verifyToken } from "../middleware/auth.js";
 
 const router = express.Router();
 
-// ✅ Protected Chat Route
-router.post("/chat", verifyToken, (req, res) => {
-  res.json({
-    message: "Chat API working",
-    user: req.user
-  });
-});
-
-
 //test 
 router.post("/test", async(req, res) => {
     try {
@@ -76,7 +67,7 @@ router.delete("/thread/:threadId", async(req, res) => {
 });
 
 //Post to Update a thread
-router.post("/chat", async(req, res) => {
+router.post("/chat", verifyToken, async(req, res) => {
     
     const {threadId, message} = req.body;
     console.log("BODY:", req.body);

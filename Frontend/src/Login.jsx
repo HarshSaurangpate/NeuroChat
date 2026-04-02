@@ -18,6 +18,7 @@ function Login({ setIsOpen }) {
   const handleLogin = async () => {
     try {
       const res = await axios.post(`${API_URL}/api/auth/login`, form);
+      localStorage.setItem("token", res.data.token);
       login(res.data);
       navigate("/");
     } catch (err) {

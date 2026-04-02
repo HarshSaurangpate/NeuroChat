@@ -24,7 +24,8 @@ router.post("/test", async(req, res) => {
 //Get all threads 
 router.get("/thread", async(req, res) => {
     try {
-        const threads = await Thread.find({}).sort({updateAt: -1});
+        const userId = req.user.id;
+        const threads = await Thread.find({ userId }).sort({updateAt: -1});
         //descending order of updatedAt...most recent data on top
         res.json(threads);
     } catch(err) {
@@ -37,7 +38,8 @@ router.get("/thread", async(req, res) => {
 router.get("/thread/:threadId", async(req, res) => {
     try {
         const {threadId} = req.params;
-        const thread = await Thread.findOne({threadId});
+        const userId = req.user.id;
+        const thread = await Thread.findOne({ threadId, userId });
 
         if(!thread) {
             return res.status(404).json({error: "Thread not found"});
@@ -78,12 +80,14 @@ router.post("/chat", verifyToken, async(req, res) => {
     
     try {
         console.log("Finding thread...");
-        let thread = await Thread.findOne({threadId});
+        const userId = req.user.id;
+        let thread = await Thread.findOne({ threadId, userId });
 
         if(!thread){
             //create a new thread in DB
             console.log("Creating new thread...");
             thread = new Thread({
+                userId,
                 threadId,
                 title: message,
                 messages:[{role: "user", content: message}]
